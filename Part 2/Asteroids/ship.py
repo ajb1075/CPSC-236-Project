@@ -93,6 +93,7 @@ class Ship:
         self.posY += self.momY
         self.rect.center = (self.posX, self.posY)
 
+        #Change Sprite depending on key input
         if (keys[pygame.K_UP] or keys[pygame.K_w]) and (keys[pygame.K_LEFT] or keys[pygame.K_a]):
             self.set_sprite(ShipSprite.SHIP_TCCW)
         elif (keys[pygame.K_UP] or keys[pygame.K_w]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d]):
