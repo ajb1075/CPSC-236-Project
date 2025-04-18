@@ -44,6 +44,13 @@ class Asteroid:
         self.rect = self.sprite_image.get_rect()
         self.rect.center = (self.posX, self.posY)
 
+        if self.sprite == AsteroidSprite.LARGE:
+            self.col_radius = 40
+        elif self.sprite == AsteroidSprite.MEDIUM:
+            self.col_radius = 30
+        else:
+            self.col_radius = 20
+
     def update(self):
         """Updates the asteroid's position, and rotates it"""
         self.posX += self.speed[0]
@@ -118,6 +125,10 @@ class Asteroid:
             score = 1
 
         return score, new_asteroids
+
+    def position_and_col_radius(self):
+        """Returns asteroid position and collision radius"""
+        return self.posX, self.posY, self.col_radius
 
 #TEST
 if __name__ == "__main__":

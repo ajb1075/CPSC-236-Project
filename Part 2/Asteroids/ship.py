@@ -39,7 +39,10 @@ class Ship:
         self.rot_speed = 4 #Degrees per update
         self.acceleration = 0.1
         self.max_speed = 5
-        self.friction = 0.98
+        self.friction = 0.99
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.col_radius = 14.5
 
         #Variables
         self.sprite = ShipSprite.SHIP
@@ -103,6 +106,17 @@ class Ship:
         else:
             self.set_sprite(ShipSprite.SHIP)
 
+        #Handle Screen Edges
+        if self.posX > self.screen_width + self.sprite_image.get_width():
+            self.posX = 0
+        elif self.posX < -self.sprite_image.get_width():
+            self.posX = self.screen_width
+
+        if self.posY > self.screen_height + self.sprite_image.get_width():
+            self.posY = 0
+        elif self.posY < -self.sprite_image.get_width():
+            self.posY = self.screen_height
+
         self.sprite_image = pygame.transform.rotate(self.sprite.get_image(), self.rot)
         self.rect = self.sprite_image.get_rect(center=self.rect.center)
 
@@ -110,19 +124,13 @@ class Ship:
         """Draw ship onto the screen"""
         screen.blit(self.sprite_image, self.rect)
 
-    def handle_screen_edge_collision(self, screen_width, screen_height):
-        """"Keeps the ship within screen bounds by wrapping around."""
-        if self.posX > screen_width:
-            self.posX = 0
-        elif self.posX < 0:
-            self.posX = screen_width
+    def position_and_col_radius(self):
+        """Returns ship position and collision radius"""
+        return self.posX, self.posY, self.col_radius
 
-        if self.posY > screen_height:
-            self.posY = 0
-        elif self.posY < 0:
-            self.posY = screen_height
-            
-        self.rect.center = (self.posX, self.posY)
+    def rotation(self):
+        """Returns the rotation of the ship"""
+        return self.rot
 
 #TEST   
 if __name__ == "__main__":
@@ -135,12 +143,12 @@ if __name__ == "__main__":
 
     ship = Ship(screen_width, screen_height)
 
-    running = True
     clock = pygame.time.Clock()
-    while running:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
+                sys.exit()
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -151,7 +159,6 @@ if __name__ == "__main__":
             ship.accelerate()   # Accelerate forward
 
         ship.update(keys)
-        ship.handle_screen_edge_collision(screen_width, screen_height)
 
         screen.fill((0, 0, 0))  # Black background
         ship.draw(screen)
@@ -159,6 +166,3 @@ if __name__ == "__main__":
         pygame.display.flip()
 
         clock.tick(60)
-
-    pygame.quit()
-    sys.exit()
