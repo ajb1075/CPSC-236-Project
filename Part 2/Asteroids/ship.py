@@ -37,7 +37,7 @@ class Ship:
         
         #Constants
         self.rot_speed = 4 #Degrees per update
-        self.acceleration = 0.2
+        self.acceleration = 0.1
         self.max_speed = 5
         self.friction = 0.98
 
