@@ -2,6 +2,7 @@
 import pygame
 import sys
 import random
+import time
 
 #Internal Imports
 from ship import Ship
@@ -10,12 +11,17 @@ from pellet import Pellet
 
 #Constants
 width, height = 800, 600
-firing_cooldown = 45
+firing_cooldown = 15
 
 #Set Up Pygame Environment
 pygame.init()
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Asteroids")
+
+#More Constants
+score_font = pygame.font.SysFont(None, 32)
+score_pos = (10, 10)
+white = (255, 255, 255)
 
 def main():
     #Global State
@@ -24,6 +30,7 @@ def main():
     ship = Ship(width, height)
     pellets = []
     time_since_last_firing = firing_cooldown
+    game_over = False
     
     clock = pygame.time.Clock()
     while True:
@@ -69,8 +76,9 @@ def main():
         #Ship Firing
         ship_posX, ship_posY, ship_col_radius = ship.position_and_col_radius()
         ship_rot = ship.rotation()
+        if time_since_last_firing % (firing_cooldown * 2) == 0 or len(pellets) >= 3:
+                pellets = pellets[1:]
         if time_since_last_firing >= firing_cooldown:
-            pellets = pellets[1:]
             if keys[pygame.K_SPACE]:
                 pellets.append(
                     Pellet(width, height, ship_posX, ship_posY, ship_rot)
@@ -92,9 +100,7 @@ def main():
 
             #Game Over
             if dist_squared < radii_sum_squared:
-                print("GAME OVER!!!")
-                pygame.quit()
-                sys.exit()
+                game_over = True
 
             #PELLET
             for pellet in pellets:
@@ -115,17 +121,25 @@ def main():
 
         #Drawing
         screen.fill((0, 0, 0)) #Black Background
-        ship.draw(screen)
-        for asteroid in asteroids:
-            asteroid.draw(screen)
-        for pellet in pellets:
-            pellet.draw(screen)
-        
-        pygame.display.flip()
+        if not game_over:
+            for pellet in pellets:
+                pellet.draw(screen)
+            ship.draw(screen)
+            for asteroid in asteroids:
+                asteroid.draw(screen)
+            screen.blit(score_font.render(f"Score: {score}", True, white), score_pos)
+            pygame.display.flip()
+        else:
+            screen.blit(score_font.render(f"Game Over", True, white), score_pos)
+            pygame.display.flip()
+            time.sleep(5)
+            pygame.quit()
+            sys.exit()
 
         time_since_last_firing += 1
         
         clock.tick(60)
+    
 
 if __name__ == "__main__":
     main()
